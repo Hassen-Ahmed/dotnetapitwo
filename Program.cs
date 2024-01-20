@@ -26,7 +26,7 @@ builder.Services.AddCors((options) =>
 
     options.AddPolicy("ProdCors", (corsBuilder) =>
     {
-        corsBuilder.WithOrigins("https://<productionSite.com>")
+        corsBuilder.WithOrigins("https://dotnet-api-two.onrender.com")
         .AllowAnyMethod()
         .AllowAnyHeader()
         .AllowCredentials()
