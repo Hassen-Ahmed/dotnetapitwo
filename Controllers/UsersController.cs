@@ -98,8 +98,6 @@ public class UserController : ControllerBase
             sqlPostUpSert += greenList.Substring(1);
         }
 
-        Console.WriteLine(sqlPostUpSert);
-
         var response = _dapper.LoadData<Post>(sqlPostUpSert, parameters).ToList();
 
         if (response.Count == 0) return NotFound();
