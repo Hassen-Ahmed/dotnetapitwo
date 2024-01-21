@@ -1,24 +1,38 @@
-FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS build-dev
 WORKDIR /app
-EXPOSE 5067
+EXPOSE 80
+EXPOSE 443
 
-ENV ASPNETCORE_URLS=http://+:5067
+COPY *.csproj ./
+RUN dotnet restore
 
-USER app
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG configuration=Release
-WORKDIR /src
-COPY ["DotnetApi.csproj", "./"]
-RUN dotnet restore "DotnetApi.csproj"
-COPY . .
-WORKDIR "/src/."
-RUN dotnet build "DotnetApi.csproj" -c $configuration -o /app/build
+COPY . ./
+RUN dotnet publish -c Release -o out
 
-FROM build AS publish
-ARG configuration=Release
-RUN dotnet publish "DotnetApi.csproj" -c $configuration -o /app/publish /p:UseAppHost=true
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final-dev
 
-FROM base AS final
-WORKDIR /app
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "DotnetApi.dll"]
+
+# FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+# WORKDIR /app
+# EXPOSE 5067
+
+# ENV ASPNETCORE_URLS=http://+:5067
+
+# USER app
+# FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+# ARG configuration=Release
+# WORKDIR /src
+# COPY ["DotnetApi.csproj", "./"]
+# RUN dotnet restore "DotnetApi.csproj"
+# COPY . .
+# WORKDIR "/src/."
+# RUN dotnet build "DotnetApi.csproj" -c $configuration -o /app/build
+
+# FROM build AS publish
+# ARG configuration=Release
+# RUN dotnet publish "DotnetApi.csproj" -c $configuration -o /app/publish /p:UseAppHost=true
+
+# FROM base AS final
+# WORKDIR /app
+# COPY --from=publish /app/publish .
+# ENTRYPOINT ["dotnet", "DotnetApi.dll"]
